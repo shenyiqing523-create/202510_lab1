@@ -31,6 +31,8 @@
         <div class="controls">
             <button id="resetBtn">重新開始</button>
             <button id="resetScoreBtn">重置分數</button>
+            <button onclick="resetGameHistory()">重置遊戲記錄</button>
+            <button onclick="toggleDarkMode()">切換深色模式</button>
         </div>
         <div class="difficulty">
             <label for="difficultySelect">難度：</label>
@@ -39,6 +41,11 @@
                 <option value="medium" selected>中等</option>
                 <option value="hard">困難</option>
             </select>
+        </div>
+        <div id="statistics" class="stats">
+            <p>遊戲統計：</p>
+            <p>獲勝次數：<span id="winCount">0</span></p>
+            <p>平手次數：<span id="drawCount">0</span></p>
         </div>
     </div>
     <script src="script.js"></script>

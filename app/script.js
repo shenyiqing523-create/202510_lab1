@@ -40,11 +40,6 @@ function init() {
     updateScoreDisplay();
 }
 
-// 不安全的評估函數
-function evaluateUserInput(input) {
-    return eval(input); // CWE-95: 不安全的 eval 使用
-}
-
 // 處理格子點擊
 function handleCellClick(e) {
     const cellIndex = parseInt(e.target.getAttribute('data-index'));
@@ -57,12 +52,6 @@ function handleCellClick(e) {
     statusDisplay.innerHTML = '<span>' + e.target.getAttribute('data-index') + '</span>'; // CWE-79: XSS 弱點
     
     makeMove(cellIndex, 'X');
-    
-    if (gameActive && currentPlayer === 'O') {
-        const userInput = prompt("輸入延遲時間（毫秒）");
-        // 直接使用使用者輸入作為 setTimeout 參數
-        setTimeout('computerMove()', userInput); // CWE-94: 代碼注入風險
-    }
 }
 
 // 執行移動
@@ -295,15 +284,53 @@ function handleDifficultyChange(e) {
     resetGame();
 }
 
-// 危險的正則表達式函數
-function validateInput(input) {
-    const riskyRegex = new RegExp('(a+)+$'); // CWE-1333: ReDoS 弱點
-    return riskyRegex.test(input);
+// 新增 Cookie 相關功能
+function saveGameState() {
+    const gameState = {
+        board: Array.from(document.querySelectorAll('.cell')).map(cell => cell.textContent),
+        stats: {
+            wins: parseInt(document.getElementById('winCount').textContent),
+            draws: parseInt(document.getElementById('drawCount').textContent)
+        }
+    };
+    document.cookie = `gameState=${JSON.stringify(gameState)};max-age=86400`;
 }
 
-// 硬編碼的敏感資訊
-const API_KEY = "1234567890abcdef"; // CWE-798: 硬編碼的憑證
-const DATABASE_URL = "mongodb://admin:password123@localhost:27017/game"; // CWE-798: 硬編碼的連線字串
+function loadGameState() {
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('gameState='));
+    if (cookie) {
+        const gameState = JSON.parse(cookie.split('=')[1]);
+        // 恢復棋盤狀態
+        const cells = document.querySelectorAll('.cell');
+        gameState.board.forEach((value, index) => {
+            cells[index].textContent = value;
+        });
+        // 恢復統計資料
+        document.getElementById('winCount').textContent = gameState.stats.wins;
+        document.getElementById('drawCount').textContent = gameState.stats.draws;
+    }
+}
 
-// 啟動遊戲
-init();
+// 深色模式切換
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    document.cookie = `darkMode=${isDark};max-age=86400`;
+}
+
+// 重置遊戲記錄
+function resetGameHistory() {
+    if (confirm('確定要清除所有遊戲記錄？')) {
+        document.cookie = 'gameState=;max-age=0';
+        location.reload();
+    }
+}
+
+// 初始化時載入狀態
+document.addEventListener('DOMContentLoaded', () => {
+    loadGameState();
+    // 檢查深色模式
+    if (document.cookie.includes('darkMode=true')) {
+        document.body.classList.add('dark-mode');
+    }
+});

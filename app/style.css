@@ -152,6 +152,7 @@ h1 {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
+    text-align: center;
 }
 
 button {
@@ -211,6 +212,25 @@ button {
 #difficultySelect:focus {
     outline: none;
     border-color: #764ba2;
+}
+
+.stats {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* 深色模式 */
+body.dark-mode {
+    background-color: #222;
+    color: #fff;
+}
+
+body.dark-mode .board {
+    background-color: #333;
+}
+
+body.dark-mode .cell {
+    border-color: #555;
 }
 
 @media (max-width: 480px) {
